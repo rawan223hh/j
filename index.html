@@ -110,7 +110,7 @@
                 }
             };
 
-            function populateQuestions() {
+           function populateQuestions() {
                 const questionsDiv = document.getElementById("questions");
                 if (!questionsDiv) return;
 
@@ -124,9 +124,9 @@
                             <label>${question}</label>
                             <select name="${element}-${index}" required>
                                 <option value="" disabled selected>اختر / Select</option>
-                                <option value="1">نادراً</option>
-                                <option value="2">أحيانًا</option>
-                                <option value="3">كثيرًا</option>
+                                <option value="1">نادراً / Rarely</option>
+                                <option value="2">أحيانًا / Sometimes</option>
+                                <option value="3">كثيرًا / Often</option>
                             </select>`;
                         questionsDiv.appendChild(div);
                     });
@@ -147,7 +147,7 @@
                 });
 
                 if (!valid) {
-                    alert("يرجى الإجابة على جميع الأسئلة قبل الإرسال.");
+                    alert("يرجى الإجابة على جميع الأسئلة قبل الإرسال / Please answer all questions before submitting.");
                     return;
                 }
 
@@ -156,15 +156,30 @@
 
                 formData.forEach((value, key) => {
                     const elementType = key.split("-")[0];
-                    scores[elementType] += parseInt(value) || 0;
+                    if (scores.hasOwnProperty(elementType)) {
+                        scores[elementType] += parseInt(value) || 0;
+                    }
                 });
 
                 const highestScore = Math.max(...Object.values(scores));
                 const dominantElements = Object.keys(scores).filter((key) => scores[key] === highestScore);
 
-                let resultHTML = "<h3>العنصر المسيطر:</h3>";
+                console.log("Scores:", scores);
+                console.log("Highest Score:", highestScore);
+                console.log("Dominant Elements:", dominantElements);
+
+                if (dominantElements.length === 0) {
+                    document.getElementById("result").innerHTML = "<h3>العنصر المسيطر:</h3> <p>لا يوجد عنصر مهيمن. حاول مرة أخرى! / No dominant element found. Try again!</p>";
+                    document.getElementById("result").style.display = "block";
+                    return;
+                }
+
+                let resultHTML = "<h3>العنصر المسيطر / Dominant Element:</h3>";
                 dominantElements.forEach((element) => {
                     resultHTML += `<strong>${element}</strong><br>`;
+                    resultHTML += `<strong>الصفات / Traits:</strong> ${elements[element].traits}<br>`;
+                    resultHTML += `<strong>النصائح / Advice:</strong> ${elements[element].advice}<br>`;
+                    resultHTML += `<strong>المهن / Careers:</strong> ${elements[element].careers}<br><br>`;
                 });
 
                 document.getElementById("result").innerHTML = resultHTML;
