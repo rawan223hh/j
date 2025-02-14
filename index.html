@@ -26,7 +26,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-        const elements = {
+            const elements = {
             Wood: {
                 traits: "نشط، فضولي، قوي الإرادة، سريع التصرف، يحب الفوز، يتعلم بالممارسة، يحب المخاطر / Energetic, curious, strong-willed, quick to act, loves to win, learns by doing, loves danger",
                 careers: "رائد أعمال، مستجيب للطوارئ، طبيب، فنان، محامٍ، معلم / Entrepreneur, Emergency Responder, Medical Careers, Artist, Lawyer, Teacher",
@@ -78,7 +78,7 @@
                 traits: "منظم، دقيق، يركز على التفاصيل / Organized, careful, detail-focused",
                 careers: "مهندس، محاسب، معمار، عالم / Engineer, Accountant, Architect, Scientist",
                 advice: "Massages, cooking, gardening, and singing. Map out the day: Create a written schedule for the child, such as wake up, eat breakfast, wash, brush teeth, to help them stay organized & develop a routine that is predictable and structured, encouraging humor, play-acting, sensory integration, I Spy Something New, silly metaphors. Engage in arts and crafts, model building, jewelry making, or activities involving patterns. Introduce music, such as playing the drums. Increase drinking water & fluids, give fish oils, prioritize bathing, swimming, and sleep. Take baths with Epsom salt each night before bed. Work on timing. Use The Breathing Exercise. Use Breathing exercises. Encourage puzzles and brain games to stimulate their mind / التدليك، الطهي، البستنة، والغناء. تخطيط اليوم: إنشاء جدول مكتوب للطفل مثل الاستيقاظ، تناول الإفطار، الغسل، تنظيف الأسنان لمساعدته على البقاء منظمًا وتطوير روتين متوقع ومنظم. تشجيع الفكاهة، التمثيل، الدمج الحسي، الانخراط في الفنون والحرف اليدوية، بناء النماذج، صنع المجوهرات، أو الأنشطة التي تتضمن الأنماط. إدخال الموسيقى، مثل العزف على الطبول. زيادة شرب الماء والسوائل، تناول زيوت السمك، وإعطاء الأولوية للاستحمام، السباحة، والنوم. أخذ حمامات بملح إبسوم كل ليلة قبل النوم. العمل على ضبط التوقيت. استخدام تمرين التنفس. تشجيع الألغاز والألعاب الذهنية لتحفيز العقل" 
-                questions:
+                questions: [
                     "هل يحب طفلك الروتين ويكره المفاجآت / Does your child like having a routine and dislike surprises or changes",
                     "هل يشتهي طفلك أطعمة غير عادية / Does your child crave unusual food",
                     "هل ينزعج طفلك عند ارتكاب الأخطاء / Does your child get upset when they make mistakes or when things go wrong",
@@ -105,8 +105,7 @@
                     "طفلك عنده مشكلة إنه يحفز نفسه يعمل حاجة؟ / Does your child struggle with being motivated to do things?",
                     "طفلك عنده ذاكرة قوية؟ / Does your child have a good memory?",
                     "طفلك بيعمل مجهود جسدي قليل؟ / Does your child experience low physical stamina?",
-                    "Does your child crave salty, meats or hot foods? / طفلك بيحب الأكلات المالحة، اللحوم أو الأكلات السخنة؟"
-               "هل يواجه طفلك صعوبة في إنهاء المهام؟"
+                    "طفلك بيحب الأكلات المالحة، اللحوم أو الأكلات السخنة؟ / Does your child crave salty, meats or hot foods?"
                     ]
                 }
             };
@@ -136,14 +135,28 @@
 
             document.getElementById("quiz-form").addEventListener("submit", function (event) {
                 event.preventDefault();
+                let valid = true;
+
+                document.querySelectorAll("select").forEach(select => {
+                    if (!select.value) {
+                        valid = false;
+                        select.style.border = "2px solid red";
+                    } else {
+                        select.style.border = "1px solid #ccc";
+                    }
+                });
+
+                if (!valid) {
+                    alert("يرجى الإجابة على جميع الأسئلة قبل الإرسال.");
+                    return;
+                }
+
                 const formData = new FormData(event.target);
                 let scores = { Wood: 0, Fire: 0, Metal: 0, Water: 0 };
 
                 formData.forEach((value, key) => {
                     const elementType = key.split("-")[0];
-                    if (scores.hasOwnProperty(elementType)) {
-                        scores[elementType] += parseInt(value) || 0;
-                    }
+                    scores[elementType] += parseInt(value) || 0;
                 });
 
                 const highestScore = Math.max(...Object.values(scores));
@@ -151,11 +164,7 @@
 
                 let resultHTML = "<h3>العنصر المسيطر:</h3>";
                 dominantElements.forEach((element) => {
-                    resultHTML += `
-                        <strong>${element}</strong><br>
-                        <strong>الصفات:</strong> ${elements[element].traits}<br>
-                        <strong>النصائح:</strong> ${elements[element].advice}<br>
-                        <strong>المهن:</strong> ${elements[element].careers}<br><br>`;
+                    resultHTML += `<strong>${element}</strong><br>`;
                 });
 
                 document.getElementById("result").innerHTML = resultHTML;
