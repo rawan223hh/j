@@ -25,6 +25,7 @@
     </div>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
         const elements = {
             Wood: {
                 traits: "نشط، فضولي، قوي الإرادة، سريع التصرف، يحب الفوز، يتعلم بالممارسة، يحب المخاطر / Energetic, curious, strong-willed, quick to act, loves to win, learns by doing, loves danger",
@@ -110,55 +111,56 @@
         };
 
         function populateQuestions() {
-            const questionsDiv = document.getElementById('questions');
-            if (!questionsDiv) return;
+                 const questionsDiv = document.getElementById("questions");
+                if (!questionsDiv) return;
 
-            questionsDiv.innerHTML = '';
+                questionsDiv.innerHTML = "";
 
-            Object.keys(elements).forEach(element => {
-                elements[element].questions.forEach((question, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'question';
-                    div.innerHTML = `<label>${question}</label>
-                        <select name="${element}-${index}" required>
-                            <option value="" disabled selected>اختر / Select</option>
-                            <option value="1">نادراً / Rarely</option>
-                            <option value="2">أحيانًا / Sometimes</option>
-                            <option value="3">كثيرًا / Often</option>
-                        </select>`;
-                    questionsDiv.appendChild(div);
+                Object.keys(elements).forEach((element) => {
+                    elements[element].questions.forEach((question, index) => {
+                        const div = document.createElement("div");
+                        div.className = "question";
+                        div.innerHTML = `
+                            <label>${question}</label>
+                            <select name="${element}-${index}" required>
+                                <option value="" disabled selected>اختر / Select</option>
+                                <option value="1">نادراً</option>
+                                <option value="2">أحيانًا</option>
+                                <option value="3">كثيرًا</option>
+                            </select>`;
+                        questionsDiv.appendChild(div);
+                    });
                 });
+            }
+
+            document.getElementById("quiz-form").addEventListener("submit", function (event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                let scores = { Wood: 0, Fire: 0, Metal: 0, Water: 0 };
+
+                formData.forEach((value, key) => {
+                    const elementType = key.split("-")[0];
+                    if (scores.hasOwnProperty(elementType)) {
+                        scores[elementType] += parseInt(value) || 0;
+                    }
+                });
+
+                const highestScore = Math.max(...Object.values(scores));
+                const dominantElements = Object.keys(scores).filter((key) => scores[key] === highestScore);
+
+                let resultHTML = "<h3>العنصر المسيطر:</h3>";
+                dominantElements.forEach((element) => {
+                    resultHTML += `
+                        <strong>${element}</strong><br>
+                        <strong>الصفات:</strong> ${elements[element].traits}<br>
+                        <strong>النصائح:</strong> ${elements[element].advice}<br>
+                        <strong>المهن:</strong> ${elements[element].careers}<br><br>`;
+                });
+
+                document.getElementById("result").innerHTML = resultHTML;
+                document.getElementById("result").style.display = "block";
             });
-        }
 
-        document.getElementById('quiz-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            let scores = { Wood: 0, Fire: 0, Metal: 0, Water: 0 };
-
-            formData.forEach((value, key) => { 
-                const elementType = key.split('-')[0]; 
-                if (scores.hasOwnProperty(elementType)) {
-                    scores[elementType] += parseInt(value) || 0; 
-                }
-            });
-
-            const highestScore = Math.max(...Object.values(scores));
-            const dominantElements = Object.keys(scores).filter(key => scores[key] === highestScore);
-
-            let resultHTML = "<h3>العنصر المسيطر / Dominant Element:</h3>";
-            dominantElements.forEach(element => {
-                resultHTML += `<strong>${element}</strong><br>
-                    <strong>الصفات / Traits:</strong> ${elements[element].traits}<br>
-                    <strong>النصائح / Advice:</strong> ${elements[element].advice}<br>
-                    <strong>المهن / Careers:</strong> ${elements[element].careers}<br><br>`;
-            });
-
-            document.getElementById('result').innerHTML = resultHTML;
-            document.getElementById('result').style.display = 'block';
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
             populateQuestions();
         });
     </script>
